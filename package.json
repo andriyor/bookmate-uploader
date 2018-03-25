@@ -1,0 +1,16 @@
+{
+  "name": "bookmate-uploader",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.5",
+    "puppeteer": "^1.1.1",
+    "readdirp": "^2.1.0"
+  }
+}
