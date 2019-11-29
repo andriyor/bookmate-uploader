@@ -1,12 +1,20 @@
-const puppeteer = require("puppeteer");
-const readdirp = require("readdirp");
 const fs = require("fs");
+
+const puppeteer = require('puppeteer-core');
+const { getPlatform } = require('chrome-launcher/dist/utils.js');
+const chromeFinder = require('chrome-launcher/dist/chrome-finder.js');
+const readdirp = require("readdirp");
 const _ = require("lodash");
 
 const CREDS = require('./creds');
 
 (async ()  => {
-    const browser = await puppeteer.launch({ headless: false });
+  const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || (await(chromeFinder)[getPlatform()]())[0];
+  if (!executablePath) {
+    throw new Error('Chromium based browser is not installed.');
+  }
+
+  const browser = await puppeteer.launch({ executablePath, headless: false });
   const page = await browser.newPage();
 
   await page.setViewport({ width: 1240, height: 680 });
@@ -24,7 +32,7 @@ const CREDS = require('./creds');
     let cookies = JSON.parse(data);
     page.setCookie(...cookies);
     console.log("using saved cookies");
-    
+
     await page.goto("https://bookmate.com", {
       waitUntil: ["domcontentloaded"]
     });
@@ -32,10 +40,8 @@ const CREDS = require('./creds');
     if (err.code === "ENOENT") {
       console.log("cookies not found!");
 
-      await page.goto("https://bookmate.com", {
-        waitUntil: ["domcontentloaded"]
-      });
-      
+      await page.goto("https://bookmate.com");
+
       const LOGIN_SELECTOR = "#login-button";
       const EMAIL_SELECTOR = "#auth-with-email";
 
@@ -102,7 +108,7 @@ const CREDS = require('./creds');
       }
     });
 
-  await page.screenshot({ path: "bookmate_wait.png" });
+  // await page.screenshot({ path: "bookmate_wait.png" });
 
-  // await browser.close();
+  await browser.close();
 })();
